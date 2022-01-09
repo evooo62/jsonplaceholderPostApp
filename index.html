@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+  <link rel="stylesheet" href="style.css">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="loading" style="display: none;" class="modal">
+
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar Alani -->
+  <header class="mb-2 border border-primary">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="align-self-center container-fluid">
+        <a class="navbar-brand" href="index.html">İcon</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Makaleler</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Iletisim</a>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+              onkeyup="search(event)" />
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <!-- main -->
+  <main class="container">
+    <div class="row">
+      <!-- category list -->
+
+
+      <div>
+        <div>
+          <div id="todos-container"></div>
+        </div>
+        <!-- <div class="my-3 p-3 bg-body rounded shadow-sm" id="makale-container">
+            <h6 class="border-bottom pb-2 mb-0">Recent updates</h6>
+            <div class="d-flex text-muted pt-3">
+              <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+        
+              <p class="pb-3 mb-0 small lh-sm border-bottom">
+                <strong class="d-block text-gray-dark">@username</strong>
+                Some representative placeholder content, with some information about this user. Imagine this being some sort of status update, perhaps?
+              </p>
+            </div>
+            
+            <small class="d-block text-end mt-3">
+              <a href="#">All updates</a>
+            </small>
+          </div> -->
+      </div>
+
+
+    </div>
+  </main>
+
+  <script>
+    var data = []; //ilk once datayi cekicez.
+    var data2 = [];
+
+
+    window.onload = async function () {
+
+      showLoading();
+      await loadData();
+      await loadData2();
+      hideLoading();
+      renderHtml(data, data2); //usersource kismin data2 kismi ile eslesecek.
+
+    };
+
+    const loadData = async () => {
+      let response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts"
+      );
+
+      data = await response.json();
+      //cektigimiz veriyi json tipine donusturuyoruz.
+      console.log("data :>> ", data);
+    };
+    const loadData2 = async () => {
+      let response = await fetch("https://jsonplaceholder.typicode.com/users");
+      data2 = await response.json();
+      console.log('data2 :>> ', data2);
+    }
+    const renderHtml = async (dataSource, userSource) => {
+      // debugger;
+
+      const container = document.getElementById("todos-container");
+      container.innerHTML = "";
+
+      dataSource.forEach((text) => {
+        let name = ''; //yeni degisken olusturmak icin. her makale yuklendiginde degisken yeniden olusuyor.
+        userSource.forEach((user) => {
+          if (text.userId === user.id) {
+            name = user.name;
+          }
+        })
+        const itemTemplate = `
+        <div class="my-3 p-3 bg-body rounded shadow-sm" id="makale-container">
+            <h6 class="border-bottom pb-2 mb-0">${text?.title}</h6>
+            <div class="d-flex text-muted pt-3">
+              <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+        
+              <p class="pb-3 mb-0 small lh-sm border-bottom">
+                <strong class="d-block text-gray-dark">${name}</strong>
+                ${text?.body}
+              </p>
+            </div>
+            
+            <small class="d-block text-end mt-3">
+              <a href="PostDetails.html?id=${text.id}" style="color: black
+              ;text-decoration: none;">Read More...</a>
+            </small>
+          </div>
+          
+        `;
+        //html den sonra soru isareti ile querystring yazabiliriz.
+
+        // ?id=${text.id}
+
+        // container HTML içeriğini değiştirmek için innerHTML özelliğini kullanırız.
+        // ekrana basma işlemine render işlemi diyoruz.
+        container.innerHTML += itemTemplate;
+      });
+
+    };
+
+    const search = (event) => {
+      let searchText = event.target.value;
+      showLoading();
+
+      const filteredData = data.filter((x) => new RegExp(searchText, 'i').test(x.title));
+
+      hideLoading();
+      renderHtml(filteredData, data2);
+
+      console.log('search', filteredData);
+      console.log('search2', filteredData2);
+      console.log('all-data', data);
+    };
+
+    const showLoading = () => {
+      const loadingDiv = document.getElementById("loading");
+      loadingDiv.setAttribute("style", "display:block; margin-top:22%");
+    };
+    const hideLoading = () => {
+      const loadingDiv = document.getElementById("loading");
+      loadingDiv.setAttribute("style", "display:none");
+    };
+
+
+
+  </script>
+</body>
+
+</html>

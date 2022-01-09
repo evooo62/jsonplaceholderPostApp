@@ -1,0 +1,9 @@
+.postDetailsCss {
+    
+    overflow: hidden; /* taşanları gizle */
+    white-space: nowrap; /* alt satıra hiç inme */
+    text-overflow: ellipsis; /* eğer uzunsa üç nokta koy */
+};
+
+
+
